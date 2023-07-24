@@ -46,6 +46,13 @@ find_package(realsense2)
 find_package(Eigen3 3.3.4 EXACT REQUIRED PATHS Thirdparty/Eigen3/install/share/eigen3/cmake)
 find_package(Pangolin REQUIRED HINTS Thirdparty/Pangolin/install/lib/cmake/Pangolin)
 
+find_package(easy_profiler 2.1.0 EXACT REQUIRED PATHS Thirdparty/EasyProfiler/install/lib/cmake/easy_profiler)
+
+if (easy_profiler_FOUND) 
+  message(STATUS "easy_profiler Found! - ${easy_profiler_DIR}")
+endif()
+
+
 include_directories(
 ${PROJECT_SOURCE_DIR}
 ${PROJECT_SOURCE_DIR}/include
@@ -127,6 +134,7 @@ ${PROJECT_SOURCE_DIR}/Thirdparty/DBoW2/lib/libDBoW2.so
 ${PROJECT_SOURCE_DIR}/Thirdparty/g2o/lib/libg2o.so
 -lboost_serialization
 -lcrypto
+easy_profiler
 )
 
 # If RealSense SDK is found the library is added and its examples compiled
