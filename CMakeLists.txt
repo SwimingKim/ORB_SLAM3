@@ -30,7 +30,8 @@ endif()
 
 LIST(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake_modules)
 
-find_package(OpenCV 4.4)
+# find_package(OpenCV 4.4)
+find_package(OpenCV 4.4 EXACT PATHS Thirdparty/OpenCV/install/lib/cmake/opencv4)
    if(NOT OpenCV_FOUND)
       message(FATAL_ERROR "OpenCV > 4.4 not found.")
    endif()
@@ -38,9 +39,12 @@ find_package(OpenCV 4.4)
 MESSAGE("OPENCV VERSION:")
 MESSAGE(${OpenCV_VERSION})
 
-find_package(Eigen3 3.1.0 REQUIRED)
-find_package(Pangolin REQUIRED)
+# find_package(Eigen3 3.1.0 REQUIRED)
+# find_package(Pangolin REQUIRED)
 find_package(realsense2)
+
+find_package(Eigen3 3.3.4 EXACT REQUIRED PATHS Thirdparty/Eigen3/install/share/eigen3/cmake)
+find_package(Pangolin REQUIRED HINTS Thirdparty/Pangolin/install/lib/cmake/Pangolin)
 
 include_directories(
 ${PROJECT_SOURCE_DIR}
