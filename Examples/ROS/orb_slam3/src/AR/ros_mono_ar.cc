@@ -23,7 +23,7 @@
 #include<chrono>
 
 #include<ros/ros.h>
-#include <cv_bridge/cv_bridge.h>
+#include <sensor_msgs/Image.h>
 
 #include<opencv2/core/core.hpp>
 #include<opencv2/imgproc/imgproc.hpp>
@@ -52,7 +52,7 @@ class ImageGrabber
 public:
     ImageGrabber(ORB_SLAM3::System* pSLAM):mpSLAM(pSLAM){}
 
-    void GrabImage(const sensor_msgs::ImageConstPtr& msg);
+    void GrabImage(const sensor_msgs::Image& msg);
 
     ORB_SLAM3::System* mpSLAM;
 };
@@ -90,7 +90,8 @@ int main(int argc, char **argv)
     ImageGrabber igb(&SLAM);
 
     ros::NodeHandle nodeHandler;
-    ros::Subscriber sub = nodeHandler.subscribe("/camera/image_raw", 1, &ImageGrabber::GrabImage,&igb);
+    ros::Subscriber sub = nodeHandler.subscribe("/cam0/image_raw", 1, &ImageGrabber::GrabImage,&igb);
+    // ros::Subscriber sub = nodeHandler.subscribe("/camera/image_raw", 1, &ImageGrabber::GrabImage,&igb);
 
 
     cv::FileStorage fSettings(argv[2], cv::FileStorage::READ);
@@ -138,26 +139,29 @@ int main(int argc, char **argv)
     return 0;
 }
 
-void ImageGrabber::GrabImage(const sensor_msgs::ImageConstPtr& msg)
+void ImageGrabber::GrabImage(const sensor_msgs::Image& msg)
 {
     // Copy the ros image message to cv::Mat.
-    cv_bridge::CvImageConstPtr cv_ptr;
-    try
-    {
-        cv_ptr = cv_bridge::toCvShare(msg);
-    }
-    catch (cv_bridge::Exception& e)
-    {
-        ROS_ERROR("cv_bridge exception: %s", e.what());
-        return;
-    }
-    cv::Mat im = cv_ptr->image.clone();
+    // cv_bridge::CvImageConstPtr cv_ptr;
+    // try
+    // {
+    //     cv_ptr = cv_bridge::toCvShare(msg);
+    // }
+    // catch (cv_bridge::Exception& e)
+    // {
+    //     ROS_ERROR("cv_bridge exception: %s", e.what());
+    //     return;
+    // }
+    // cv::Mat im = cv_ptr->image.clone();
+
+    cv::Mat im = cv::Mat(msg.height, msg.width, CV_8UC3, const_cast<uint8_t*>(&msg.data[0]), msg.step);
     cv::Mat imu;
 
     // cv::Mat Tcw = mpSLAM->TrackMonocular(cv_ptr->image,cv_ptr->header.stamp.toSec());
 
     cv::Mat Tcw;
-    Sophus::SE3f Tcw_SE3f = mpSLAM->TrackMonocular(cv_ptr->image,cv_ptr->header.stamp.toSec());
+    Sophus::SE3f Tcw_SE3f = mpSLAM->TrackMonocular(im,msg.header.stamp.toSec());
+    // Sophus::SE3f Tcw_SE3f = mpSLAM->TrackMonocular(cv_ptr->image,cv_ptr->header.stamp.toSec());
     Eigen::Matrix4f Tcw_Matrix = Tcw_SE3f.matrix();
     cv::eigen2cv(Tcw_Matrix, Tcw);
 
@@ -171,7 +175,8 @@ void ImageGrabber::GrabImage(const sensor_msgs::ImageConstPtr& msg)
         viewerAR.SetImagePose(imu,Tcw,state,vKeys,vMPs);
     else
     {
-        cv::cvtColor(imu,imu,CV_RGB2BGR);
+        cv::cvtColor(imu,imu,cv::COLOR_BGR2RGB);
+        // cv::cvtColor(imu,imu,CV_RGB2BGR);
         viewerAR.SetImagePose(imu,Tcw,state,vKeys,vMPs);
     }    
 }

@@ -35,11 +35,11 @@ LIST(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/../../../cmake_modules)
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
-  cv_bridge
   image_transport
   roscpp
   roslib
   sensor_msgs
+  std_msgs
   tf
 )
 
@@ -50,6 +50,8 @@ find_package(OpenCV 4.4 EXACT PATHS /home/ubuntu/Documents/dev/ORB_SLAM3/Thirdpa
 
 find_package(Eigen3 3.3.4 EXACT REQUIRED PATHS /home/ubuntu/Documents/dev/ORB_SLAM3/Thirdparty/Eigen3/install/share/eigen3/cmake)
 find_package(Pangolin REQUIRED HINTS /home/ubuntu/Documents/dev/ORB_SLAM3/Thirdparty/Pangolin/install/lib/cmake/Pangolin)
+
+find_package(easy_profiler 2.1.0 EXACT REQUIRED PATHS /home/ubuntu/Documents/dev/ORB_SLAM3/Thirdparty/EasyProfiler/install/lib/cmake/easy_profiler)
 
 ## Uncomment this if the package has a setup.py. This macro ensures
 ## modules and global scripts declared therein get installed
@@ -139,7 +141,7 @@ find_package(Pangolin REQUIRED HINTS /home/ubuntu/Documents/dev/ORB_SLAM3/Thirdp
 catkin_package(
  INCLUDE_DIRS include
  LIBRARIES orb_slam3
- CATKIN_DEPENDS cv_bridge image_transport roscpp roslib sensor_msgs tf
+ CATKIN_DEPENDS image_transport roscpp roslib sensor_msgs std_msgs tf
 #  DEPENDS system_lib
 )
 
@@ -151,6 +153,7 @@ catkin_package(
 ## Your package locations should be listed before other locations
 include_directories(
 # include
+  ${OpenCV_LIBRARIES}
   ${catkin_INCLUDE_DIRS}
   ${PROJECT_SOURCE_DIR}
   ${PROJECT_SOURCE_DIR}/../../../
@@ -169,6 +172,7 @@ set(LIBS
   ${PROJECT_SOURCE_DIR}/../../../Thirdparty/g2o/lib/libg2o.so
   ${PROJECT_SOURCE_DIR}/../../../lib/libORB_SLAM3.so
   -lboost_system
+  easy_profiler
 )
 message("LIBS: ${LIBS}")
 
@@ -189,11 +193,11 @@ message("LIBS: ${LIBS}")
 add_executable(${PROJECT_NAME}_node src/main.cpp)
 add_executable(Mono src/ros_mono.cc)
 
-# add_executable(MonoAR
-#   src/AR/ros_mono_ar.cc
-#   src/AR/ViewerAR.h
-#   src/AR/ViewerAR.cc
-# )
+add_executable(MonoAR
+  src/AR/ros_mono_ar.cc
+  src/AR/ViewerAR.h
+  src/AR/ViewerAR.cc
+)
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
@@ -206,17 +210,20 @@ add_executable(Mono src/ros_mono.cc)
 # add_dependencies(${PROJECT_NAME}_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 ## Specify libraries to link a library or executable target against
-# target_link_libraries(${PROJECT_NAME}_node
-#   ${catkin_LIBRARIES}
-# )
+target_link_libraries(${PROJECT_NAME}_node
+  ${catkin_LIBRARIES}
+  ${OpenCV_LIBRARIES}
+)
 target_link_libraries(Mono
   ${catkin_LIBRARIES}
+  ${OpenCV_LIBRARIES}
   ${LIBS}
 )
-# target_link_libraries(MonoAR
-#   ${catkin_LIBRARIES}
-#   ${LIBS}
-# )
+target_link_libraries(MonoAR
+  ${catkin_LIBRARIES}
+  ${OpenCV_LIBRARIES}
+  ${LIBS}
+)
 
 #############
 ## Install ##

@@ -23,7 +23,6 @@
 #include<chrono>
 
 #include<ros/ros.h>
-// #include <cv_bridge/cv_bridge.h>
 #include <sensor_msgs/Image.h>
 
 #include<opencv2/core/core.hpp>
@@ -45,7 +44,7 @@ public:
 int main(int argc, char **argv)
 {
     ros::init(argc, argv, "Mono");
-    // ros::start();
+    ros::start();
 
     if(argc != 3)
     {
@@ -60,8 +59,7 @@ int main(int argc, char **argv)
     ImageGrabber igb(&SLAM);
 
     ros::NodeHandle nodeHandler;
-    ros::Subscriber sub = nodeHandler.subscribe("/cam0/image_raw", 1, &ImageGrabber::GrabImage,&igb);
-    // ros::Subscriber sub = nodeHandler.subscribe("/camera/image_raw", 1, &ImageGrabber::GrabImage,&igb);
+    ros::Subscriber sub = nodeHandler.subscribe("/cam0/image_raw", 1, &ImageGrabber::GrabImage, &igb);
 
     ros::spin();
 
@@ -91,13 +89,10 @@ void ImageGrabber::GrabImage(const sensor_msgs::Image& msg)
     // }
     // mpSLAM->TrackMonocular(cv_ptr->image,cv_ptr->header.stamp.toSec());
 
-    cv::Mat frame;
-    // cv::Mat src = cv::Mat(480, 640, CV_8UC3, const_cast(&msg.data[0]), msg.step);
-    // cv::cvtColor(src, frame, cv::COLOR_RGB2BGR);
     cv::Mat src = cv::Mat(msg.height, msg.width, CV_8UC3, const_cast<uint8_t*>(&msg.data[0]), msg.step);
-    // cv::cvtColor(src, frame, cv::COLOR_RGB2BGR);
+    // cv::cvtColor(src, src, cv::COLOR_RGB2BGR);
 
-    // mpSLAM->TrackMonocular(frame, msg.header.stamp.toSec());
+    mpSLAM->TrackMonocular(src, msg.header.stamp.toSec());
 
 }
 
