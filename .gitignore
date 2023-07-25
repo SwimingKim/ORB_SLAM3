@@ -95,3 +95,7 @@ borrar/*
 Thirdparty/
 .vscode/
 *.prof
+
+
+devel/
+.catkin_workspace

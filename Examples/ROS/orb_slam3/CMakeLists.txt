@@ -1,8 +1,35 @@
 cmake_minimum_required(VERSION 3.0.2)
 project(orb_slam3)
 
+IF(NOT ROS_BUILD_TYPE)
+  SET(ROS_BUILD_TYPE Release)
+ENDIF()
+
+MESSAGE("Build type: " ${ROS_BUILD_TYPE})
+
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS}  -Wall  -O3 -march=native ")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall  -O3 -march=native")
+
 ## Compile as C++11, supported in ROS Kinetic and newer
 # add_compile_options(-std=c++11)
+
+# Check C++11 or C++0x support
+include(CheckCXXCompilerFlag)
+CHECK_CXX_COMPILER_FLAG("-std=c++11" COMPILER_SUPPORTS_CXX11)
+CHECK_CXX_COMPILER_FLAG("-std=c++0x" COMPILER_SUPPORTS_CXX0X)
+if(COMPILER_SUPPORTS_CXX11)
+   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+   add_definitions(-DCOMPILEDWITHC11)
+   message(STATUS "Using flag -std=c++11.")
+elseif(COMPILER_SUPPORTS_CXX0X)
+   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x")
+   add_definitions(-DCOMPILEDWITHC0X)
+   message(STATUS "Using flag -std=c++0x.")
+else()
+   message(FATAL_ERROR "The compiler ${CMAKE_CXX_COMPILER} has no C++11 support. Please use a different C++ compiler.")
+endif()
+
+LIST(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/../../../cmake_modules)
 
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
@@ -19,6 +46,10 @@ find_package(catkin REQUIRED COMPONENTS
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
 
+find_package(OpenCV 4.4 EXACT PATHS /home/ubuntu/Documents/dev/ORB_SLAM3/Thirdparty/OpenCV/install/lib/cmake/opencv4)
+
+find_package(Eigen3 3.3.4 EXACT REQUIRED PATHS /home/ubuntu/Documents/dev/ORB_SLAM3/Thirdparty/Eigen3/install/share/eigen3/cmake)
+find_package(Pangolin REQUIRED HINTS /home/ubuntu/Documents/dev/ORB_SLAM3/Thirdparty/Pangolin/install/lib/cmake/Pangolin)
 
 ## Uncomment this if the package has a setup.py. This macro ensures
 ## modules and global scripts declared therein get installed
@@ -106,9 +137,9 @@ find_package(catkin REQUIRED COMPONENTS
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
-#  INCLUDE_DIRS include
-#  LIBRARIES orb_slam3
-#  CATKIN_DEPENDS cv_bridge image_transport roscpp roslib sensor_msgs tf
+ INCLUDE_DIRS include
+ LIBRARIES orb_slam3
+ CATKIN_DEPENDS cv_bridge image_transport roscpp roslib sensor_msgs tf
 #  DEPENDS system_lib
 )
 
@@ -121,7 +152,25 @@ catkin_package(
 include_directories(
 # include
   ${catkin_INCLUDE_DIRS}
+  ${PROJECT_SOURCE_DIR}
+  ${PROJECT_SOURCE_DIR}/../../../
+  ${PROJECT_SOURCE_DIR}/../../../include
+  ${PROJECT_SOURCE_DIR}/../../../include/CameraModels
+  ${PROJECT_SOURCE_DIR}/../../../Thirdparty/Sophus
+  ${Pangolin_INCLUDE_DIRS}
 )
+
+set(LIBS 
+  ${OpenCV_LIBS} 
+  # ${EIGEN3_LIBS}
+  ${Eigen3_LIBS}
+  ${Pangolin_LIBRARIES}
+  ${PROJECT_SOURCE_DIR}/../../../Thirdparty/DBoW2/lib/libDBoW2.so
+  ${PROJECT_SOURCE_DIR}/../../../Thirdparty/g2o/lib/libg2o.so
+  ${PROJECT_SOURCE_DIR}/../../../lib/libORB_SLAM3.so
+  -lboost_system
+)
+message("LIBS: ${LIBS}")
 
 ## Declare a C++ library
 # add_library(${PROJECT_NAME}
@@ -138,6 +187,13 @@ include_directories(
 ## The recommended prefix ensures that target names across packages don't collide
 # add_executable(${PROJECT_NAME}_node src/orb_slam3_node.cpp)
 add_executable(${PROJECT_NAME}_node src/main.cpp)
+add_executable(Mono src/ros_mono.cc)
+
+add_executable(MonoAR
+  src/AR/ros_mono_ar.cc
+  src/AR/ViewerAR.h
+  src/AR/ViewerAR.cc
+)
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
@@ -153,6 +209,14 @@ add_executable(${PROJECT_NAME}_node src/main.cpp)
 # target_link_libraries(${PROJECT_NAME}_node
 #   ${catkin_LIBRARIES}
 # )
+target_link_libraries(Mono
+  ${catkin_LIBRARIES}
+  ${LIBS}
+)
+target_link_libraries(MonoAR
+  ${catkin_LIBRARIES}
+  ${LIBS}
+)
 
 #############
 ## Install ##
