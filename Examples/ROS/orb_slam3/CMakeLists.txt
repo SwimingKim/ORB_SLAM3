@@ -189,11 +189,11 @@ message("LIBS: ${LIBS}")
 add_executable(${PROJECT_NAME}_node src/main.cpp)
 add_executable(Mono src/ros_mono.cc)
 
-add_executable(MonoAR
-  src/AR/ros_mono_ar.cc
-  src/AR/ViewerAR.h
-  src/AR/ViewerAR.cc
-)
+# add_executable(MonoAR
+#   src/AR/ros_mono_ar.cc
+#   src/AR/ViewerAR.h
+#   src/AR/ViewerAR.cc
+# )
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
@@ -213,10 +213,10 @@ target_link_libraries(Mono
   ${catkin_LIBRARIES}
   ${LIBS}
 )
-target_link_libraries(MonoAR
-  ${catkin_LIBRARIES}
-  ${LIBS}
-)
+# target_link_libraries(MonoAR
+#   ${catkin_LIBRARIES}
+#   ${LIBS}
+# )
 
 #############
 ## Install ##

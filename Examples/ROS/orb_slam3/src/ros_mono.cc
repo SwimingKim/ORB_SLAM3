@@ -23,7 +23,8 @@
 #include<chrono>
 
 #include<ros/ros.h>
-#include <cv_bridge/cv_bridge.h>
+// #include <cv_bridge/cv_bridge.h>
+#include <sensor_msgs/Image.h>
 
 #include<opencv2/core/core.hpp>
 
@@ -36,7 +37,7 @@ class ImageGrabber
 public:
     ImageGrabber(ORB_SLAM3::System* pSLAM):mpSLAM(pSLAM){}
 
-    void GrabImage(const sensor_msgs::ImageConstPtr& msg);
+    void GrabImage(const sensor_msgs::Image& msg);
 
     ORB_SLAM3::System* mpSLAM;
 };
@@ -75,7 +76,7 @@ int main(int argc, char **argv)
     return 0;
 }
 
-void ImageGrabber::GrabImage(const sensor_msgs::ImageConstPtr& msg)
+void ImageGrabber::GrabImage(const sensor_msgs::Image& msg)
 {
     // // Copy the ros image message to cv::Mat.
     // cv_bridge::CvImageConstPtr cv_ptr;
@@ -88,8 +89,16 @@ void ImageGrabber::GrabImage(const sensor_msgs::ImageConstPtr& msg)
     //     ROS_ERROR("cv_bridge exception: %s", e.what());
     //     return;
     // }
-
     // mpSLAM->TrackMonocular(cv_ptr->image,cv_ptr->header.stamp.toSec());
+
+    cv::Mat frame;
+    // cv::Mat src = cv::Mat(480, 640, CV_8UC3, const_cast(&msg.data[0]), msg.step);
+    // cv::cvtColor(src, frame, cv::COLOR_RGB2BGR);
+    cv::Mat src = cv::Mat(msg.height, msg.width, CV_8UC3, const_cast<uint8_t*>(&msg.data[0]), msg.step);
+    // cv::cvtColor(src, frame, cv::COLOR_RGB2BGR);
+
+    // mpSLAM->TrackMonocular(frame, msg.header.stamp.toSec());
+
 }
 
 
