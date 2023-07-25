@@ -63,7 +63,7 @@ void LocalMapping::SetTracker(Tracking *pTracker)
 
 void LocalMapping::Run()
 {
-    EASY_FUNCTION("Run", profiler::colors::Brown100);
+    // EASY_FUNCTION("LocalMapping Run", profiler::colors::Brown100);
 
     mbFinished = false;
 
@@ -153,6 +153,7 @@ void LocalMapping::Run()
                     }
                     else
                     {
+                        EASY_BLOCK("Local BA", profiler::colors::Brown200);
                         Optimizer::LocalBundleAdjustment(mpCurrentKeyFrame,&mbAbortBA, mpCurrentKeyFrame->GetMap(),num_FixedKF_BA,num_OptKF_BA,num_MPs_BA,num_edges_BA);
                         b_doneLBA = true;
                     }
@@ -299,6 +300,7 @@ bool LocalMapping::CheckNewKeyFrames()
 
 void LocalMapping::ProcessNewKeyFrame()
 {
+    // EASY_FUNCTION("KeyFrame Insertion", profiler::colors::Brown200);
     {
         unique_lock<mutex> lock(mMutexNewKFs);
         mpCurrentKeyFrame = mlNewKeyFrames.front();
@@ -347,7 +349,7 @@ void LocalMapping::EmptyQueue()
 
 void LocalMapping::MapPointCulling()
 {
-    EASY_FUNCTION("MapPointCulling", profiler::colors::Brown100);
+    // EASY_FUNCTION("Recent MapPoints Culling", profiler::colors::Brown200);
 
     // Check Recent Added MapPoints
     list<MapPoint*>::iterator lit = mlpRecentAddedMapPoints.begin();
@@ -391,7 +393,7 @@ void LocalMapping::MapPointCulling()
 
 void LocalMapping::CreateNewMapPoints()
 {
-    EASY_FUNCTION("CreateNewMapPoints", profiler::colors::Brown100);
+    // EASY_FUNCTION("New Points Creation", profiler::colors::Brown200);
 
     // Retrieve neighbor keyframes in covisibility graph
     int nn = 10;
@@ -719,8 +721,6 @@ void LocalMapping::CreateNewMapPoints()
 
 void LocalMapping::SearchInNeighbors()
 {
-    EASY_FUNCTION("SearchInNeighbors", profiler::colors::Brown100);
-
     // Retrieve neighbor keyframes
     int nn = 10;
     if(mbMonocular)
@@ -909,7 +909,7 @@ void LocalMapping::InterruptBA()
 
 void LocalMapping::KeyFrameCulling()
 {
-    EASY_FUNCTION("KeyFrameCulling", profiler::colors::Brown100);
+    // EASY_FUNCTION("Local KeyFrames Culling", profiler::colors::Brown200);
 
     // Check redundant keyframes (only local keyframes)
     // A keyframe is considered redundant if the 90% of the MapPoints it sees, are seen
@@ -1086,8 +1086,6 @@ void LocalMapping::RequestReset()
 
 void LocalMapping::RequestResetActiveMap(Map* pMap)
 {
-    EASY_FUNCTION("RequestResetActiveMap", profiler::colors::Brown100);
-
     {
         unique_lock<mutex> lock(mMutexReset);
         cout << "LM: Active map reset recieved" << endl;
@@ -1110,8 +1108,6 @@ void LocalMapping::RequestResetActiveMap(Map* pMap)
 
 void LocalMapping::ResetIfRequested()
 {
-    EASY_FUNCTION("ResetIfRequested", profiler::colors::Brown100);
-
     bool executed_reset = false;
     {
         unique_lock<mutex> lock(mMutexReset);
@@ -1186,7 +1182,7 @@ bool LocalMapping::isFinished()
 
 void LocalMapping::InitializeIMU(float priorG, float priorA, bool bFIBA)
 {
-    EASY_FUNCTION("InitializeIMU", profiler::colors::Brown100);
+    // EASY_FUNCTION("IMU Initialization", profiler::colors::Brown200);
 
     if (mbResetRequested)
         return;
@@ -1444,7 +1440,7 @@ void LocalMapping::InitializeIMU(float priorG, float priorA, bool bFIBA)
 
 void LocalMapping::ScaleRefinement()
 {
-    EASY_FUNCTION("ScaleRefinement", profiler::colors::Brown100);
+    // EASY_FUNCTION("IMU Scale Refinement", profiler::colors::Brown200);
 
     // Minimum number of keyframes to compute a solution
     // Minimum time (seconds) between first and last keyframe to compute a solution. Make the difference between monocular and stereo

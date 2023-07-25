@@ -55,7 +55,6 @@ int main(int argc, char **argv)
     LoadImages(string(argv[3]), vstrImageFilenames, vTimestamps);
 
     int nImages = vstrImageFilenames.size();
-    // int nImages = 10;
 
     EASY_BLOCK("SLAM", profiler::colors::DeepOrange800);
     // Create SLAM system. It initializes all system threads and gets ready to process frames.

@@ -533,6 +533,7 @@ Tracking::~Tracking()
 }
 
 void Tracking::newParameterLoader(Settings *settings) {
+    // EASY_FUNCTION("Extract ORB", profiler::colors::DeepPurple200);           
     mpCamera = settings->camera1();
     mpCamera = mpAtlas->AddCamera(mpCamera);
 
@@ -1565,8 +1566,6 @@ Sophus::SE3f Tracking::GrabImageRGBD(const cv::Mat &imRGB,const cv::Mat &imD, co
 
 Sophus::SE3f Tracking::GrabImageMonocular(const cv::Mat &im, const double &timestamp, string filename)
 {
-    EASY_FUNCTION("GrabImageMonocular", profiler::colors::Green100);
-
     mImGray = im;
     if(mImGray.channels()==3)
     {
@@ -1625,6 +1624,7 @@ void Tracking::GrabImuData(const IMU::Point &imuMeasurement)
 
 void Tracking::PreintegrateIMU()
 {
+    // EASY_FUNCTION("IMU integration", profiler::colors::DeepPurple200);
 
     if(!mCurrentFrame.mpPrevFrame)
     {
@@ -1795,7 +1795,7 @@ void Tracking::ResetFrameIMU()
 
 void Tracking::Track()
 {
-    EASY_FUNCTION("Track", profiler::colors::Green100);
+    // EASY_FUNCTION("Track", profiler::colors::DeepPurple200);
 
     if (bStepByStep)
     {
@@ -1931,6 +1931,8 @@ void Tracking::Track()
 #ifdef REGISTER_TIMES
         std::chrono::steady_clock::time_point time_StartPosePred = std::chrono::steady_clock::now();
 #endif
+
+        // EASY_BLOCK("Initial Pose Estimation", profiler::colors::DeepPurple200);
 
         // Initial camera pose estimation using motion model or relocalization (if tracking is lost)
         if(!mbOnlyTracking)
@@ -2110,6 +2112,8 @@ void Tracking::Track()
 
         if(!mCurrentFrame.mpReferenceKF)
             mCurrentFrame.mpReferenceKF = mpReferenceKF;
+
+        // EASY_END_BLOCK;
 
 #ifdef REGISTER_TIMES
         std::chrono::steady_clock::time_point time_EndPosePred = std::chrono::steady_clock::now();
@@ -2450,7 +2454,7 @@ void Tracking::StereoInitialization()
 
 void Tracking::MonocularInitialization()
 {
-    EASY_FUNCTION("MonocularInitialization", profiler::colors::Blue500);
+    // EASY_FUNCTION("MonocularInitialization", profiler::colors::Blue500);
 
     if(!mbReadyToInitializate)
     {
@@ -2665,6 +2669,8 @@ void Tracking::CreateInitialMapMonocular()
 
 void Tracking::CreateMapInAtlas()
 {
+    // EASY_FUNCTION("Map Creation", profiler::colors::DeepPurple200);
+
     mnLastInitFrameId = mCurrentFrame.mnId;
     mpAtlas->CreateNewMap();
     if (mSensor==System::IMU_STEREO || mSensor == System::IMU_MONOCULAR || mSensor == System::IMU_RGBD)
@@ -2952,6 +2958,7 @@ bool Tracking::TrackWithMotionModel()
 
 bool Tracking::TrackLocalMap()
 {
+    // EASY_FUNCTION("Track Local Map", profiler::colors::DeepPurple200);
 
     // We have an estimation of the camera pose and some map points tracked in the frame.
     // We retrieve the local map and try to find matches to points in the local map.
@@ -3612,6 +3619,7 @@ void Tracking::UpdateLocalKeyFrames()
 
 bool Tracking::Relocalization()
 {
+    // EASY_FUNCTION("Relocaliztion", profiler::colors::DeepPurple200);
     Verbose::PrintMess("Starting relocalization", Verbose::VERBOSITY_NORMAL);
     // Compute Bag of Words Vector
     mCurrentFrame.ComputeBoW();
