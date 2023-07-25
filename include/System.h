@@ -40,6 +40,7 @@
 #include "ImuTypes.h"
 #include "Settings.h"
 
+#include<easy/profiler.h>
 
 namespace ORB_SLAM3
 {

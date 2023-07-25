@@ -1565,6 +1565,8 @@ Sophus::SE3f Tracking::GrabImageRGBD(const cv::Mat &imRGB,const cv::Mat &imD, co
 
 Sophus::SE3f Tracking::GrabImageMonocular(const cv::Mat &im, const double &timestamp, string filename)
 {
+    EASY_FUNCTION("GrabImageMonocular", profiler::colors::Green100);
+
     mImGray = im;
     if(mImGray.channels()==3)
     {
@@ -1793,6 +1795,7 @@ void Tracking::ResetFrameIMU()
 
 void Tracking::Track()
 {
+    EASY_FUNCTION("Track", profiler::colors::Green100);
 
     if (bStepByStep)
     {
@@ -2447,6 +2450,7 @@ void Tracking::StereoInitialization()
 
 void Tracking::MonocularInitialization()
 {
+    EASY_FUNCTION("MonocularInitialization", profiler::colors::Blue500);
 
     if(!mbReadyToInitializate)
     {

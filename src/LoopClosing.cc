@@ -89,6 +89,8 @@ void LoopClosing::SetLocalMapper(LocalMapping *pLocalMapper)
 
 void LoopClosing::Run()
 {
+    EASY_FUNCTION("Run", profiler::colors::Teal100);
+
     mbFinished =false;
 
     while(1)
@@ -323,6 +325,8 @@ bool LoopClosing::CheckNewKeyFrames()
 
 bool LoopClosing::NewDetectCommonRegions()
 {
+    EASY_FUNCTION("NewDetectCommonRegions", profiler::colors::Teal100);
+
     // To deactivate placerecognition. No loopclosing nor merging will be performed
     if(!mbActiveLC)
         return false;
@@ -1307,7 +1311,7 @@ void LoopClosing::MergeLocal()
     vector<KeyFrame*> vpCovisibleKFs = mpCurrentKF->GetBestCovisibilityKeyFrames(numTemporalKFs);
     spLocalWindowKFs.insert(vpCovisibleKFs.begin(), vpCovisibleKFs.end());
     spLocalWindowKFs.insert(mpCurrentKF);
-    const int nMaxTries = 5;
+    const int nMaxTries = 20;
     int nNumTries = 0;
     while(spLocalWindowKFs.size() < numTemporalKFs && nNumTries < nMaxTries)
     {
@@ -2512,6 +2516,7 @@ void LoopClosing::RunGlobalBundleAdjustment(Map* pActiveMap, unsigned long nLoop
 
 void LoopClosing::RequestFinish()
 {
+    std::cout << "RequestFinish" << std::endl;
     unique_lock<mutex> lock(mMutexFinish);
     // cout << "LC: Finish requested" << endl;
     mbFinishRequested = true;
@@ -2525,6 +2530,7 @@ bool LoopClosing::CheckFinish()
 
 void LoopClosing::SetFinish()
 {
+    std::cout << "SetFinish" << std::endl;
     unique_lock<mutex> lock(mMutexFinish);
     mbFinished = true;
 }

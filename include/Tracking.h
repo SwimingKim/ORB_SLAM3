@@ -42,6 +42,8 @@
 #include <mutex>
 #include <unordered_set>
 
+#include <easy/profiler.h>
+
 namespace ORB_SLAM3
 {
 

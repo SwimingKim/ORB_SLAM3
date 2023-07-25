@@ -45,19 +45,6 @@ int main(int argc, char **argv)
     profiler::startListen();
     profiler::startCapture();
 
-    EASY_BLOCK("Calculating sum");
-    int sum = 0;
-    for (int i = 0; i < 10; ++i) {
-        EASY_BLOCK("Addition", profiler::colors::Red);
-        sum += i;
-    }
-    EASY_END_BLOCK;
-
-
-    int mul = 1;
-    for (int i = 1; i < 11; ++i)
-        mul *= i;
-
     if(argc != 4)
     {
         cerr << endl << "Usage: ./mono_kitti path_to_vocabulary path_to_settings path_to_sequence" << endl;
@@ -76,6 +63,7 @@ int main(int argc, char **argv)
     // Create SLAM system. It initializes all system threads and gets ready to process frames.
     ORB_SLAM3::System SLAM(argv[1],argv[2],ORB_SLAM3::System::MONOCULAR,true);
     float imageScale = SLAM.GetImageScale();
+
     EASY_END_BLOCK;
 
     // Vector for tracking time statistics
@@ -170,6 +158,8 @@ EASY_END_BLOCK;
         if(ttrack<T)
             usleep((T-ttrack)*1e6);
 
+        std::cout << ni << std::endl;
+
         EASY_END_BLOCK;
     }
 
@@ -196,7 +186,8 @@ EASY_END_BLOCK;
     cout << "mean tracking time: " << totaltime/nImages << endl;
 
     // Save camera trajectory
-    SLAM.SaveKeyFrameTrajectoryTUM("KeyFrameTrajectory.txt");    
+    SLAM.SaveTrajectoryKITTI("CameraTrajectory.txt");
+    SLAM.SaveKeyFrameTrajectoryTUM("KeyFrameTrajectory.txt");
 
     auto result = profiler::dumpBlocksToFile("slam_profile.prof");
     std::cout << "result " << result << std::endl;
