@@ -533,7 +533,7 @@ Tracking::~Tracking()
 }
 
 void Tracking::newParameterLoader(Settings *settings) {
-    // EASY_FUNCTION("Extract ORB", profiler::colors::DeepPurple200);           
+    EASY_FUNCTION("Extract ORB", profiler::colors::DeepPurple200);           
     mpCamera = settings->camera1();
     mpCamera = mpAtlas->AddCamera(mpCamera);
 

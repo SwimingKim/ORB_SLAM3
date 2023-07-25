@@ -63,12 +63,13 @@ void LocalMapping::SetTracker(Tracking *pTracker)
 
 void LocalMapping::Run()
 {
-    // EASY_FUNCTION("LocalMapping Run", profiler::colors::Brown100);
 
     mbFinished = false;
 
     while(1)
     {
+        EASY_BLOCK("LocalMapping Run", profiler::colors::Brown100);
+
         // Tracking will see that Local Mapping is busy
         SetAcceptKeyFrames(false);
 
@@ -180,6 +181,8 @@ void LocalMapping::Run()
 
 #endif
 
+                EASY_BLOCK("IMU Initialization", profiler::colors::Brown200);
+
                 // Initialize IMU here
                 if(!mpCurrentKeyFrame->GetMap()->isImuInitialized() && mbInertial)
                 {
@@ -188,6 +191,8 @@ void LocalMapping::Run()
                     else
                         InitializeIMU(1e2, 1e5, true);
                 }
+
+                EASY_END_BLOCK;
 
 
                 // Check redundant local Keyframes
@@ -279,9 +284,13 @@ void LocalMapping::Run()
             break;
 
         usleep(3000);
+
+
+        EASY_END_BLOCK;
     }
 
     SetFinish();
+
 }
 
 void LocalMapping::InsertKeyFrame(KeyFrame *pKF)
@@ -1440,7 +1449,7 @@ void LocalMapping::InitializeIMU(float priorG, float priorA, bool bFIBA)
 
 void LocalMapping::ScaleRefinement()
 {
-    // EASY_FUNCTION("IMU Scale Refinement", profiler::colors::Brown200);
+    EASY_FUNCTION("IMU Scale Refinement", profiler::colors::Brown200);
 
     // Minimum number of keyframes to compute a solution
     // Minimum time (seconds) between first and last keyframe to compute a solution. Make the difference between monocular and stereo
