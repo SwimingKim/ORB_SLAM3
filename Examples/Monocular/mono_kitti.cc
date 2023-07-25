@@ -39,8 +39,6 @@ void LoadImages(const string &strSequence, vector<string> &vstrImageFilenames,
 
 int main(int argc, char **argv)
 {
-    std::cout << "EASY_PROFILER" << std::endl;
-
     EASY_PROFILER_ENABLE;
     profiler::startListen();
     profiler::startCapture();
@@ -121,7 +119,6 @@ int main(int argc, char **argv)
         }
 
 
-EASY_BLOCK("TrackMonocular", profiler::colors::Amber100);
 #ifdef COMPILEDWITHC11
         std::chrono::steady_clock::time_point t1 = std::chrono::steady_clock::now();
 #else
@@ -130,7 +127,6 @@ EASY_BLOCK("TrackMonocular", profiler::colors::Amber100);
 
         // Pass the image to the SLAM system
         SLAM.TrackMonocular(im,tframe,vector<ORB_SLAM3::IMU::Point>(), vstrImageFilenames[ni]);
-EASY_END_BLOCK;
 
 #ifdef COMPILEDWITHC11
         std::chrono::steady_clock::time_point t2 = std::chrono::steady_clock::now();
@@ -157,8 +153,6 @@ EASY_END_BLOCK;
 
         if(ttrack<T)
             usleep((T-ttrack)*1e6);
-
-        std::cout << ni << std::endl;
 
         EASY_END_BLOCK;
     }

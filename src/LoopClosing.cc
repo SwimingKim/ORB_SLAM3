@@ -2516,7 +2516,6 @@ void LoopClosing::RunGlobalBundleAdjustment(Map* pActiveMap, unsigned long nLoop
 
 void LoopClosing::RequestFinish()
 {
-    std::cout << "RequestFinish" << std::endl;
     unique_lock<mutex> lock(mMutexFinish);
     // cout << "LC: Finish requested" << endl;
     mbFinishRequested = true;
@@ -2530,7 +2529,6 @@ bool LoopClosing::CheckFinish()
 
 void LoopClosing::SetFinish()
 {
-    std::cout << "SetFinish" << std::endl;
     unique_lock<mutex> lock(mMutexFinish);
     mbFinished = true;
 }
