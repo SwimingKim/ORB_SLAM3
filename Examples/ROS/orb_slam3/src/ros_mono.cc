@@ -89,8 +89,8 @@ void ImageGrabber::GrabImage(const sensor_msgs::Image& msg)
     // }
     // mpSLAM->TrackMonocular(cv_ptr->image,cv_ptr->header.stamp.toSec());
 
-    cv::Mat src = cv::Mat(msg.height, msg.width, CV_8UC3, const_cast<uint8_t*>(&msg.data[0]), msg.step);
-    // cv::cvtColor(src, src, cv::COLOR_RGB2BGR);
+    cv::Mat src = cv::Mat(msg.height, msg.width, CV_8UC1, const_cast<uint8_t*>(&msg.data[0]), msg.step);
+    cv::cvtColor(src, src, cv::COLOR_RGB2BGR);
 
     mpSLAM->TrackMonocular(src, msg.header.stamp.toSec());
 
