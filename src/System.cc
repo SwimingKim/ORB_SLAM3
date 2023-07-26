@@ -109,6 +109,7 @@ System::System(const string &strVocFile, const string &strSettingsFile, const eS
 
     bool loadedAtlas = false;
 
+    EASY_BLOCK("Load ORB Vocbulary And Create Database", profiler::colors::Magenta);
     if(mStrLoadAtlasFromFile.empty())
     {
         //Load ORB Vocabulary
@@ -176,6 +177,7 @@ System::System(const string &strVocFile, const string &strSettingsFile, const eS
 
         //usleep(10*1000*1000);
     }
+    EASY_END_BLOCK;
 
 
     if (mSensor==IMU_STEREO || mSensor==IMU_MONOCULAR || mSensor==IMU_RGBD)

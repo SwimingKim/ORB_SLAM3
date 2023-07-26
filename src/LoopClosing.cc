@@ -89,7 +89,7 @@ void LoopClosing::SetLocalMapper(LocalMapping *pLocalMapper)
 
 void LoopClosing::Run()
 {
-    EASY_FUNCTION("Run", profiler::colors::Teal100);
+    EASY_FUNCTION("Looping Closing Run", profiler::colors::Teal100);
 
     mbFinished =false;
 
@@ -325,7 +325,7 @@ bool LoopClosing::CheckNewKeyFrames()
 
 bool LoopClosing::NewDetectCommonRegions()
 {
-    EASY_FUNCTION("NewDetectCommonRegions", profiler::colors::Teal100);
+    EASY_BLOCK("NewDetectCommonRegions", profiler::colors::Teal100);
 
     // To deactivate placerecognition. No loopclosing nor merging will be performed
     if(!mbActiveLC)
@@ -524,6 +524,8 @@ bool LoopClosing::NewDetectCommonRegions()
 #endif
 
     mpKeyFrameDB->add(mpCurrentKF);
+
+    EASY_END_BLOCK;
 
     if(mbMergeDetected || mbLoopDetected)
     {
@@ -1008,6 +1010,7 @@ void LoopClosing::CorrectLoop()
     mpCurrentKF->UpdateConnections();
     //assert(mpCurrentKF->GetMap()->CheckEssentialGraph());
 
+    EASY_BLOCK("Compute Sim 3/SE3", profiler::colors::Indigo300);
     // Retrive keyframes connected to the current keyframe and compute corrected Sim3 pose by propagation
     mvpCurrentConnectedKFs = mpCurrentKF->GetVectorCovisibleKeyFrames();
     mvpCurrentConnectedKFs.push_back(mpCurrentKF);
@@ -1137,6 +1140,7 @@ void LoopClosing::CorrectLoop()
         }
         //cout << "LC: end replacing duplicated" << endl;
     }
+    EASY_END_BLOCK;
 
     // Project MapPoints observed in the neighborhood of the loop keyframe
     // into the current keyframe and neighbors using corrected poses.
@@ -1176,6 +1180,8 @@ void LoopClosing::CorrectLoop()
         double timeFusion = std::chrono::duration_cast<std::chrono::duration<double,std::milli> >(time_EndFusion - time_StartFusion).count();
         vdLoopFusion_ms.push_back(timeFusion);
 #endif
+
+    EASY_BLOCK("Optimize Essential Graph", profiler::colors::Indigo300);
     //cout << "Optimize essential graph" << endl;
     if(pLoopMap->IsInertial() && pLoopMap->isImuInitialized())
     {
@@ -1191,13 +1197,16 @@ void LoopClosing::CorrectLoop()
 
     double timeOptEss = std::chrono::duration_cast<std::chrono::duration<double,std::milli> >(time_EndOpt - time_EndFusion).count();
     vdLoopOptEss_ms.push_back(timeOptEss);
+
 #endif
+    EASY_END_BLOCK;
 
     mpAtlas->InformNewBigChange();
 
     // Add loop edge
     mpLoopMatchedKF->AddLoopEdge(mpCurrentKF);
     mpCurrentKF->AddLoopEdge(mpLoopMatchedKF);
+
 
     // Launch a new thread to perform Global Bundle Adjustment (Only if few keyframes, if not it would take too much time)
     if(!pLoopMap->isImuInitialized() || (pLoopMap->KeyFramesInMap()<200 && mpAtlas->CountMaps()==1))
@@ -1209,6 +1218,7 @@ void LoopClosing::CorrectLoop()
 
         mpThreadGBA = new thread(&LoopClosing::RunGlobalBundleAdjustment, this, pLoopMap, mpCurrentKF->mnId);
     }
+
 
     // Loop closed. Release Local Mapping.
     mpLocalMapper->Release();    
@@ -1258,6 +1268,8 @@ void LoopClosing::MergeLocal()
     //cout << "Local Map stopped" << endl;
 
     mpLocalMapper->EmptyQueue();
+
+    EASY_BLOCK("Merge Map", profiler::colors::Indigo300);
 
     // Merge map will become in the new active map with the local window of KFs and MPs from the current map.
     // Later, the elements of the current map will be transform to the new active map reference, in order to keep real time tracking
@@ -1559,6 +1571,7 @@ void LoopClosing::MergeLocal()
 
         //std::cout << "[Merge]: merging maps finished" << std::endl;
     }
+    EASY_END_BLOCK;
 
     //Rebuild the essential graph in the local window
     pCurrentMap->GetOriginKF()->SetFirstConnection(false);
@@ -1609,6 +1622,7 @@ void LoopClosing::MergeLocal()
     }
 
     //std::cout << "[Merge]: Start welding bundle adjustment" << std::endl;
+    EASY_BLOCK("Welding BA", profiler::colors::Indigo300);
 
 #ifdef REGISTER_TIMES
     std::chrono::steady_clock::time_point time_StartWeldingBA = std::chrono::steady_clock::now();
@@ -1638,6 +1652,7 @@ void LoopClosing::MergeLocal()
     vdWeldingBA_ms.push_back(timeWeldingBA);
 #endif
     //std::cout << "[Merge]: Welding bundle adjustment finished" << std::endl;
+    EASY_END_BLOCK;
 
     // Loop closed. Release Local Mapping.
     mpLocalMapper->Release();

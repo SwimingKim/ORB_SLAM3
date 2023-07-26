@@ -29,11 +29,6 @@
 
 using namespace std;
 
-void magenta_func()
-{
-    EASY_FUNCTION(profiler::colors::Magenta);
-}
-
 void LoadImages(const string &strSequence, vector<string> &vstrImageFilenames,
                 vector<double> &vTimestamps);
 
@@ -55,6 +50,7 @@ int main(int argc, char **argv)
     LoadImages(string(argv[3]), vstrImageFilenames, vTimestamps);
 
     int nImages = vstrImageFilenames.size();
+    // int nImages = 2000;
 
     EASY_BLOCK("SLAM", profiler::colors::DeepOrange800);
     // Create SLAM system. It initializes all system threads and gets ready to process frames.
@@ -138,11 +134,11 @@ int main(int argc, char **argv)
             SLAM.InsertTrackTime(t_track);
 #endif
 
-        EASY_BLOCK("vTimestamps", profiler::colors::BlueGrey200);
         double ttrack= std::chrono::duration_cast<std::chrono::duration<double> >(t2 - t1).count();
 
         vTimesTrack[ni]=ttrack;
 
+        EASY_BLOCK("Wait To Load the Next Frame", profiler::colors::BlueGrey200);
         // Wait to load the next frame
         double T=0;
         if(ni<nImages-1)
@@ -190,7 +186,7 @@ int main(int argc, char **argv)
 
 void LoadImages(const string &strPathToSequence, vector<string> &vstrImageFilenames, vector<double> &vTimestamps)
 {
-    EASY_FUNCTION(profiler::colors::Magenta);
+    EASY_BLOCK("Load Images", profiler::colors::Magenta);
     
     ifstream fTimes;
     string strPathTimeFile = strPathToSequence + "/times.txt";
@@ -208,17 +204,13 @@ void LoadImages(const string &strPathToSequence, vector<string> &vstrImageFilena
             vTimestamps.push_back(t);
         }
     }
-    EASY_END_BLOCK;
 
     string strPrefixLeft = strPathToSequence + "/image_0/";
 
-    EASY_BLOCK("resize");
     const int nTimes = vTimestamps.size();
     vstrImageFilenames.resize(nTimes);
-    EASY_END_BLOCK;
 
 
-    EASY_BLOCK("vstrImageFilenames");
     for(int i=0; i<nTimes; i++)
     {
         stringstream ss;

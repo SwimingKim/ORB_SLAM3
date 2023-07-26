@@ -533,7 +533,7 @@ Tracking::~Tracking()
 }
 
 void Tracking::newParameterLoader(Settings *settings) {
-    EASY_FUNCTION("Extract ORB", profiler::colors::DeepPurple200);           
+    EASY_BLOCK("Extract ORB", profiler::colors::DeepPurple200);           
     mpCamera = settings->camera1();
     mpCamera = mpAtlas->AddCamera(mpCamera);
 
@@ -615,6 +615,8 @@ void Tracking::newParameterLoader(Settings *settings) {
     mpImuCalib = new IMU::Calib(Tbc,Ng*sf,Na*sf,Ngw/sf,Naw/sf);
 
     mpImuPreintegratedFromLastKF = new IMU::Preintegrated(IMU::Bias(),*mpImuCalib);
+
+    EASY_END_BLOCK;
 }
 
 bool Tracking::ParseCamParamFile(cv::FileStorage &fSettings)
@@ -1624,7 +1626,7 @@ void Tracking::GrabImuData(const IMU::Point &imuMeasurement)
 
 void Tracking::PreintegrateIMU()
 {
-    // EASY_FUNCTION("IMU integration", profiler::colors::DeepPurple200);
+    EASY_BLOCK("IMU integration", profiler::colors::DeepPurple200);
 
     if(!mCurrentFrame.mpPrevFrame)
     {
@@ -1734,6 +1736,8 @@ void Tracking::PreintegrateIMU()
     mCurrentFrame.setIntegrated();
 
     //Verbose::PrintMess("Preintegration is finished!! ", Verbose::VERBOSITY_DEBUG);
+
+    EASY_END_BLOCK;
 }
 
 
@@ -1795,7 +1799,7 @@ void Tracking::ResetFrameIMU()
 
 void Tracking::Track()
 {
-    // EASY_FUNCTION("Track", profiler::colors::DeepPurple200);
+    EASY_BLOCK("Track", profiler::colors::DeepPurple200);
 
     if (bStepByStep)
     {
@@ -1932,7 +1936,7 @@ void Tracking::Track()
         std::chrono::steady_clock::time_point time_StartPosePred = std::chrono::steady_clock::now();
 #endif
 
-        // EASY_BLOCK("Initial Pose Estimation", profiler::colors::DeepPurple200);
+        EASY_BLOCK("Initial Pose Estimation", profiler::colors::DeepPurple200);
 
         // Initial camera pose estimation using motion model or relocalization (if tracking is lost)
         if(!mbOnlyTracking)
@@ -2113,7 +2117,7 @@ void Tracking::Track()
         if(!mCurrentFrame.mpReferenceKF)
             mCurrentFrame.mpReferenceKF = mpReferenceKF;
 
-        // EASY_END_BLOCK;
+        EASY_END_BLOCK;
 
 #ifdef REGISTER_TIMES
         std::chrono::steady_clock::time_point time_EndPosePred = std::chrono::steady_clock::now();
@@ -2336,6 +2340,8 @@ void Tracking::Track()
         }
     }
 #endif
+
+    EASY_END_BLOCK;
 }
 
 
@@ -2454,7 +2460,7 @@ void Tracking::StereoInitialization()
 
 void Tracking::MonocularInitialization()
 {
-    // EASY_FUNCTION("MonocularInitialization", profiler::colors::Blue500);
+    EASY_BLOCK("MonocularInitialization", profiler::colors::Blue500);
 
     if(!mbReadyToInitializate)
     {
@@ -2527,6 +2533,8 @@ void Tracking::MonocularInitialization()
             CreateInitialMapMonocular();
         }
     }
+
+    EASY_END_BLOCK;
 }
 
 
@@ -2669,7 +2677,7 @@ void Tracking::CreateInitialMapMonocular()
 
 void Tracking::CreateMapInAtlas()
 {
-    // EASY_FUNCTION("Map Creation", profiler::colors::DeepPurple200);
+    EASY_BLOCK("Map Creation", profiler::colors::DeepPurple200);
 
     mnLastInitFrameId = mCurrentFrame.mnId;
     mpAtlas->CreateNewMap();
@@ -2707,6 +2715,8 @@ void Tracking::CreateMapInAtlas()
     mvIniMatches.clear();
 
     mbCreatedMap = true;
+
+    EASY_END_BLOCK
 }
 
 void Tracking::CheckReplacedInLastFrame()
@@ -2958,7 +2968,7 @@ bool Tracking::TrackWithMotionModel()
 
 bool Tracking::TrackLocalMap()
 {
-    // EASY_FUNCTION("Track Local Map", profiler::colors::DeepPurple200);
+    EASY_BLOCK("Track Local Map", profiler::colors::DeepPurple200);
 
     // We have an estimation of the camera pose and some map points tracked in the frame.
     // We retrieve the local map and try to find matches to points in the local map.
@@ -3070,6 +3080,8 @@ bool Tracking::TrackLocalMap()
         else
             return true;
     }
+
+    EASY_END_BLOCK;
 }
 
 bool Tracking::NeedNewKeyFrame()
@@ -3619,7 +3631,7 @@ void Tracking::UpdateLocalKeyFrames()
 
 bool Tracking::Relocalization()
 {
-    // EASY_FUNCTION("Relocaliztion", profiler::colors::DeepPurple200);
+    EASY_BLOCK("Relocaliztion", profiler::colors::DeepPurple200);
     Verbose::PrintMess("Starting relocalization", Verbose::VERBOSITY_NORMAL);
     // Compute Bag of Words Vector
     mCurrentFrame.ComputeBoW();
@@ -3785,6 +3797,8 @@ bool Tracking::Relocalization()
         cout << "Relocalized!!" << endl;
         return true;
     }
+
+    EASY_END_BLOCK;
 
 }
 
