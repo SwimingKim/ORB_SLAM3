@@ -1,0 +1,1 @@
+evo_traj kitti CameraTrajectory.txt --align --correct_scale --ref=evo/00_mono.txt -p --plot_mode=xz

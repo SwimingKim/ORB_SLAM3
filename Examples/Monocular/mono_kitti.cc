@@ -178,8 +178,10 @@ int main(int argc, char **argv)
     SLAM.SaveTrajectoryKITTI("CameraTrajectory.txt");
     SLAM.SaveKeyFrameTrajectoryTUM("KeyFrameTrajectory.txt");
 
-    auto result = profiler::dumpBlocksToFile("slam_profile.prof");
-    std::cout << "result " << result << std::endl;
+    if (nImages != vstrImageFilenames.size()) {
+        auto result = profiler::dumpBlocksToFile("slam_profile.prof");
+        std::cout << "result " << result << std::endl;
+    }
 
     return 0;
 }
