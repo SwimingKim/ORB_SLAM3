@@ -74,11 +74,11 @@ int main(int argc, char **argv)
     cv::Mat im;
     for(int ni=0; ni<nImages; ni++)
     {
-        EASY_BLOCK("imread", profiler::colors::Blue500);
+        // EASY_BLOCK("imread", profiler::colors::Blue500);
         // Read image from file
         im = cv::imread(vstrImageFilenames[ni],cv::IMREAD_UNCHANGED); //,cv::IMREAD_UNCHANGED);
         double tframe = vTimestamps[ni];
-        EASY_END_BLOCK;
+        // EASY_END_BLOCK;
 
         if(im.empty())
         {
@@ -158,18 +158,14 @@ int main(int argc, char **argv)
     EASY_END_BLOCK;
 
 
-    EASY_BLOCK("sort", profiler::colors::Blue300);
     // Tracking time statistics
     sort(vTimesTrack.begin(),vTimesTrack.end());
     float totaltime = 0;
-    EASY_END_BLOCK;
 
-    EASY_BLOCK("total_time", profiler::colors::Blue300);
     for(int ni=0; ni<nImages; ni++)
     {
         totaltime+=vTimesTrack[ni];
     }
-    EASY_END_BLOCK;
     cout << "-------" << endl << endl;
     cout << "median tracking time: " << vTimesTrack[nImages/2] << endl;
     cout << "mean tracking time: " << totaltime/nImages << endl;
@@ -218,7 +214,7 @@ void LoadImages(const string &strPathToSequence, vector<string> &vstrImageFilena
         stringstream ss;
         ss << setfill('0') << setw(6) << i;
         vstrImageFilenames[i] = strPrefixLeft + ss.str() + ".png";
-        EASY_BLOCK("Addition", profiler::colors::Red);
+        // EASY_BLOCK("Addition", profiler::colors::Red);
     }
     EASY_END_BLOCK;
 }

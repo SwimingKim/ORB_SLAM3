@@ -1799,7 +1799,7 @@ void Tracking::ResetFrameIMU()
 
 void Tracking::Track()
 {
-    EASY_BLOCK("Track", profiler::colors::DeepPurple200);
+    // EASY_BLOCK("Track", profiler::colors::DeepPurple200);
 
     if (bStepByStep)
     {
@@ -2341,7 +2341,7 @@ void Tracking::Track()
     }
 #endif
 
-    EASY_END_BLOCK;
+    // EASY_END_BLOCK;
 }
 
 

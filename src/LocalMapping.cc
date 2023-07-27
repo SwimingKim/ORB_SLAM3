@@ -154,10 +154,10 @@ void LocalMapping::Run()
                     }
                     else
                     {
-                        EASY_BLOCK("Local BA", profiler::colors::Brown200);
+                        // EASY_BLOCK("Local BA", profiler::colors::Brown200);
                         Optimizer::LocalBundleAdjustment(mpCurrentKeyFrame,&mbAbortBA, mpCurrentKeyFrame->GetMap(),num_FixedKF_BA,num_OptKF_BA,num_MPs_BA,num_edges_BA);
                         b_doneLBA = true;
-                        EASY_END_BLOCK;
+                        // EASY_END_BLOCK;
                     }
 
                 }
