@@ -533,7 +533,7 @@ Tracking::~Tracking()
 }
 
 void Tracking::newParameterLoader(Settings *settings) {
-    EASY_BLOCK("Extract ORB", profiler::colors::DeepPurple200);           
+    // EASY_BLOCK("newParameterLoader", profiler::colors::DeepPurple200);           
     mpCamera = settings->camera1();
     mpCamera = mpAtlas->AddCamera(mpCamera);
 
@@ -616,7 +616,7 @@ void Tracking::newParameterLoader(Settings *settings) {
 
     mpImuPreintegratedFromLastKF = new IMU::Preintegrated(IMU::Bias(),*mpImuCalib);
 
-    EASY_END_BLOCK;
+    // EASY_END_BLOCK;
 }
 
 bool Tracking::ParseCamParamFile(cv::FileStorage &fSettings)

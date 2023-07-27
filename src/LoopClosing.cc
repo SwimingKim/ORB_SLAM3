@@ -974,6 +974,7 @@ int LoopClosing::FindMatchesByProjection(KeyFrame* pCurrentKF, KeyFrame* pMatche
 
 void LoopClosing::CorrectLoop()
 {
+    EASY_BLOCK("Loop Closing", profiler::colors::Indigo500);
     //cout << "Loop detected!" << endl;
 
     // Send a stop signal to Local Mapping
@@ -1224,6 +1225,8 @@ void LoopClosing::CorrectLoop()
     mpLocalMapper->Release();    
 
     mLastLoopKFid = mpCurrentKF->mnId; //TODO old varible, it is not use in the new algorithm
+
+    EASY_END_BLOCK;
 }
 
 void LoopClosing::MergeLocal()

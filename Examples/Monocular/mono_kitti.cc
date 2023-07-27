@@ -50,7 +50,7 @@ int main(int argc, char **argv)
     LoadImages(string(argv[3]), vstrImageFilenames, vTimestamps);
 
     int nImages = vstrImageFilenames.size();
-    // int nImages = 2000;
+    // int nImages = 20;
 
     EASY_BLOCK("SLAM", profiler::colors::DeepOrange800);
     // Create SLAM system. It initializes all system threads and gets ready to process frames.
@@ -174,10 +174,8 @@ int main(int argc, char **argv)
     SLAM.SaveTrajectoryKITTI("CameraTrajectory.txt");
     SLAM.SaveKeyFrameTrajectoryTUM("KeyFrameTrajectory.txt");
 
-    if (nImages != vstrImageFilenames.size()) {
-        auto result = profiler::dumpBlocksToFile("slam_profile.prof");
-        std::cout << "result " << result << std::endl;
-    }
+    auto result = profiler::dumpBlocksToFile("slam_profile.prof");
+    std::cout << "result " << result << std::endl;
 
     return 0;
 }
