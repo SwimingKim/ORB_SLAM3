@@ -22,7 +22,7 @@ for c in cam:
 
 print("size: %d" % len(traj_list))
 
-f = open("%s.txt" % txt_prefix, "w")
+f = open("%s_mean.txt" % txt_prefix, "w")
 
 half_size = int(len(traj_list) * 0.5)
 print("half: %d" % half_size)
