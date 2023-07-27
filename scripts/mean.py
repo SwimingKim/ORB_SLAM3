@@ -3,7 +3,7 @@ import os
 cam = [0, 1]
 # CameraTrajectory_00.txt
 
-txt_prefix = "CameraTrajectory"
+txt_prefix = "image"
 
 traj_list = []
 for c in cam:
