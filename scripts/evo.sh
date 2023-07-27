@@ -11,7 +11,9 @@ echo $line
 
 if [ $line -eq 4541 ]
 then
+    evo_traj kitti CameraTrajectory.txt --align --correct_scale --ref=evo/00.txt -p --plot_mode=xz
     evo_ape kitti evo/00.txt CameraTrajectory.txt --plot --plot_mode xz  --align --correct_scale
 else
+    evo_traj kitti CameraTrajectory.txt --align --correct_scale --ref=evo/00_mono.txt -p --plot_mode=xz
     evo_ape kitti evo/00_mono.txt CameraTrajectory.txt --plot --plot_mode xz  --align --correct_scale
 fi
