@@ -44,12 +44,12 @@ find_package(catkin REQUIRED COMPONENTS
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
 
-find_package(OpenCV 4.4 EXACT PATHS /home/ubuntu/Documents/dev/ORB_SLAM3/Thirdparty/OpenCV/install/lib/cmake/opencv4)
+find_package(OpenCV 4.4 EXACT PATHS ${PROJECT_SOURCE_DIR}/../../../Thirdparty/OpenCV/install/lib/cmake/opencv4)
 
-find_package(Eigen3 3.3.4 EXACT REQUIRED PATHS /home/ubuntu/Documents/dev/ORB_SLAM3/Thirdparty/Eigen3/install/share/eigen3/cmake)
-find_package(Pangolin REQUIRED HINTS /home/ubuntu/Documents/dev/ORB_SLAM3/Thirdparty/Pangolin/install/lib/cmake/Pangolin)
+find_package(Eigen3 3.3.4 EXACT REQUIRED PATHS ${PROJECT_SOURCE_DIR}/../../../Thirdparty/Eigen3/install/share/eigen3/cmake)
+find_package(Pangolin REQUIRED HINTS ${PROJECT_SOURCE_DIR}/../../../Thirdparty/Pangolin/install/lib/cmake/Pangolin)
 
-find_package(easy_profiler 2.1.0 EXACT REQUIRED PATHS /home/ubuntu/Documents/dev/ORB_SLAM3/Thirdparty/EasyProfiler/install/lib/cmake/easy_profiler)
+find_package(easy_profiler 2.1.0 EXACT REQUIRED PATHS ${PROJECT_SOURCE_DIR}/../../../Thirdparty/EasyProfiler/install/lib/cmake/easy_profiler)
 
 ## Uncomment this if the package has a setup.py. This macro ensures
 ## modules and global scripts declared therein get installed
