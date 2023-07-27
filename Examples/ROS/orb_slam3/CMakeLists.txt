@@ -35,12 +35,8 @@ LIST(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/../../../cmake_modules)
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
-  image_transport
   roscpp
-  roslib
   sensor_msgs
-  std_msgs
-  tf
 )
 
 ## System dependencies are found with CMake's conventions
@@ -141,7 +137,7 @@ find_package(easy_profiler 2.1.0 EXACT REQUIRED PATHS /home/ubuntu/Documents/dev
 catkin_package(
  INCLUDE_DIRS include
  LIBRARIES orb_slam3
- CATKIN_DEPENDS image_transport roscpp roslib sensor_msgs std_msgs tf
+ CATKIN_DEPENDS roscpp sensor_msgs
 #  DEPENDS system_lib
 )
 
