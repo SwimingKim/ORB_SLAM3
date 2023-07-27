@@ -37,6 +37,8 @@ LIST(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/../../../cmake_modules)
 find_package(catkin REQUIRED COMPONENTS
   roscpp
   sensor_msgs
+  message_filters
+  # cv_bridge
 )
 
 ## System dependencies are found with CMake's conventions
@@ -137,7 +139,7 @@ find_package(easy_profiler 2.1.0 EXACT REQUIRED PATHS /home/ubuntu/Documents/dev
 catkin_package(
  INCLUDE_DIRS include
  LIBRARIES orb_slam3
- CATKIN_DEPENDS roscpp sensor_msgs
+ CATKIN_DEPENDS roscpp sensor_msgs message_filters
 #  DEPENDS system_lib
 )
 
@@ -160,7 +162,8 @@ include_directories(
 )
 
 set(LIBS 
-  ${OpenCV_LIBS} 
+  # ${OpenCV_LIBS} 
+  ${OpenCV_LIBRARIES}
   # ${EIGEN3_LIBS}
   ${Eigen3_LIBS}
   ${Pangolin_LIBRARIES}
@@ -195,6 +198,12 @@ add_executable(MonoAR
   src/AR/ViewerAR.cc
 )
 
+# add_executable(Stereo src/ros_stereo.cc)
+# add_executable(RGBD src/ros_rgbd.cc)
+# add_executable(Mono_Inertial src/ros_mono_inertial.cc)
+# add_executable(Stereo_Inertial src/ros_stereo_inertial.cc)
+
+
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
 ## target back to the shorter version for ease of user use
@@ -208,18 +217,32 @@ add_executable(MonoAR
 ## Specify libraries to link a library or executable target against
 target_link_libraries(${PROJECT_NAME}_node
   ${catkin_LIBRARIES}
-  ${OpenCV_LIBRARIES}
+  ${LIBS}
 )
 target_link_libraries(Mono
   ${catkin_LIBRARIES}
-  ${OpenCV_LIBRARIES}
   ${LIBS}
 )
 target_link_libraries(MonoAR
   ${catkin_LIBRARIES}
-  ${OpenCV_LIBRARIES}
   ${LIBS}
 )
+# target_link_libraries(Stereo
+#   ${catkin_LIBRARIES}
+#   ${LIBS}
+# )
+# target_link_libraries(RGBD
+#   ${catkin_LIBRARIES}
+#   ${LIBS}
+# )
+# target_link_libraries(Mono_Inertial
+#   ${catkin_LIBRARIES}
+#   ${LIBS}
+# )
+# target_link_libraries(Stereo_Inertial
+#   ${catkin_LIBRARIES}
+#   ${LIBS}
+# )
 
 #############
 ## Install ##
