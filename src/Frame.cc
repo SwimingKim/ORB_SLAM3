@@ -475,6 +475,7 @@ void Frame::SetImuPoseVelocity(const Eigen::Matrix3f &Rwb, const Eigen::Vector3f
 
 void Frame::UpdatePoseMatrices()
 {
+    EASY_FUNCTION(profiler::colors::Red600);
     Sophus::SE3<float> Twc = mTcw.inverse();
     mRwc = Twc.rotationMatrix();
     mOw = Twc.translation();
