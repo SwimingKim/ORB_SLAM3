@@ -533,6 +533,7 @@ Tracking::~Tracking()
 }
 
 void Tracking::newParameterLoader(Settings *settings) {
+    // EASY_BLOCK("newParameterLoader", profiler::colors::DeepPurple200);           
     mpCamera = settings->camera1();
     mpCamera = mpAtlas->AddCamera(mpCamera);
 
@@ -614,6 +615,8 @@ void Tracking::newParameterLoader(Settings *settings) {
     mpImuCalib = new IMU::Calib(Tbc,Ng*sf,Na*sf,Ngw/sf,Naw/sf);
 
     mpImuPreintegratedFromLastKF = new IMU::Preintegrated(IMU::Bias(),*mpImuCalib);
+
+    // EASY_END_BLOCK;
 }
 
 bool Tracking::ParseCamParamFile(cv::FileStorage &fSettings)
@@ -1565,6 +1568,8 @@ Sophus::SE3f Tracking::GrabImageRGBD(const cv::Mat &imRGB,const cv::Mat &imD, co
 
 Sophus::SE3f Tracking::GrabImageMonocular(const cv::Mat &im, const double &timestamp, string filename)
 {
+    EASY_FUNCTION(profiler::colors::Red700);
+
     mImGray = im;
     if(mImGray.channels()==3)
     {
@@ -1623,6 +1628,7 @@ void Tracking::GrabImuData(const IMU::Point &imuMeasurement)
 
 void Tracking::PreintegrateIMU()
 {
+    EASY_BLOCK("IMU integration", profiler::colors::DeepPurple200);
 
     if(!mCurrentFrame.mpPrevFrame)
     {
@@ -1732,6 +1738,8 @@ void Tracking::PreintegrateIMU()
     mCurrentFrame.setIntegrated();
 
     //Verbose::PrintMess("Preintegration is finished!! ", Verbose::VERBOSITY_DEBUG);
+
+    EASY_END_BLOCK;
 }
 
 
@@ -1793,6 +1801,7 @@ void Tracking::ResetFrameIMU()
 
 void Tracking::Track()
 {
+    // EASY_BLOCK("Track", profiler::colors::DeepPurple200);
 
     if (bStepByStep)
     {
@@ -1928,6 +1937,8 @@ void Tracking::Track()
 #ifdef REGISTER_TIMES
         std::chrono::steady_clock::time_point time_StartPosePred = std::chrono::steady_clock::now();
 #endif
+
+        EASY_BLOCK("Initial Pose Estimation", profiler::colors::DeepPurple200);
 
         // Initial camera pose estimation using motion model or relocalization (if tracking is lost)
         if(!mbOnlyTracking)
@@ -2107,6 +2118,8 @@ void Tracking::Track()
 
         if(!mCurrentFrame.mpReferenceKF)
             mCurrentFrame.mpReferenceKF = mpReferenceKF;
+
+        EASY_END_BLOCK;
 
 #ifdef REGISTER_TIMES
         std::chrono::steady_clock::time_point time_EndPosePred = std::chrono::steady_clock::now();
@@ -2329,6 +2342,8 @@ void Tracking::Track()
         }
     }
 #endif
+
+    // EASY_END_BLOCK;
 }
 
 
@@ -2447,6 +2462,7 @@ void Tracking::StereoInitialization()
 
 void Tracking::MonocularInitialization()
 {
+    EASY_BLOCK("MonocularInitialization", profiler::colors::Blue500);
 
     if(!mbReadyToInitializate)
     {
@@ -2519,6 +2535,8 @@ void Tracking::MonocularInitialization()
             CreateInitialMapMonocular();
         }
     }
+
+    EASY_END_BLOCK;
 }
 
 
@@ -2661,6 +2679,8 @@ void Tracking::CreateInitialMapMonocular()
 
 void Tracking::CreateMapInAtlas()
 {
+    EASY_BLOCK("Map Creation", profiler::colors::DeepPurple200);
+
     mnLastInitFrameId = mCurrentFrame.mnId;
     mpAtlas->CreateNewMap();
     if (mSensor==System::IMU_STEREO || mSensor == System::IMU_MONOCULAR || mSensor == System::IMU_RGBD)
@@ -2697,6 +2717,8 @@ void Tracking::CreateMapInAtlas()
     mvIniMatches.clear();
 
     mbCreatedMap = true;
+
+    EASY_END_BLOCK
 }
 
 void Tracking::CheckReplacedInLastFrame()
@@ -2948,6 +2970,7 @@ bool Tracking::TrackWithMotionModel()
 
 bool Tracking::TrackLocalMap()
 {
+    EASY_BLOCK("Track Local Map", profiler::colors::DeepPurple200);
 
     // We have an estimation of the camera pose and some map points tracked in the frame.
     // We retrieve the local map and try to find matches to points in the local map.
@@ -3059,6 +3082,8 @@ bool Tracking::TrackLocalMap()
         else
             return true;
     }
+
+    EASY_END_BLOCK;
 }
 
 bool Tracking::NeedNewKeyFrame()
@@ -3608,6 +3633,7 @@ void Tracking::UpdateLocalKeyFrames()
 
 bool Tracking::Relocalization()
 {
+    EASY_BLOCK("Relocaliztion", profiler::colors::DeepPurple200);
     Verbose::PrintMess("Starting relocalization", Verbose::VERBOSITY_NORMAL);
     // Compute Bag of Words Vector
     mCurrentFrame.ComputeBoW();
@@ -3773,6 +3799,8 @@ bool Tracking::Relocalization()
         cout << "Relocalized!!" << endl;
         return true;
     }
+
+    EASY_END_BLOCK;
 
 }
 

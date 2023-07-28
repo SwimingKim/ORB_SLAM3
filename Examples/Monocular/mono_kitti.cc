@@ -23,6 +23,8 @@
 #include<iomanip>
 
 #include<opencv2/core/core.hpp>
+#include <easy/profiler.h>
+#include <easy/arbitrary_value.h>
 
 #include"System.h"
 
@@ -33,6 +35,10 @@ void LoadImages(const string &strSequence, vector<string> &vstrImageFilenames,
 
 int main(int argc, char **argv)
 {
+    EASY_PROFILER_ENABLE;
+    profiler::startListen();
+    profiler::startCapture();
+
     if(argc != 4)
     {
         cerr << endl << "Usage: ./mono_kitti path_to_vocabulary path_to_settings path_to_sequence" << endl;
@@ -45,10 +51,14 @@ int main(int argc, char **argv)
     LoadImages(string(argv[3]), vstrImageFilenames, vTimestamps);
 
     int nImages = vstrImageFilenames.size();
+    // int nImages = 20;
 
+    EASY_BLOCK("SLAM", profiler::colors::DeepOrange800);
     // Create SLAM system. It initializes all system threads and gets ready to process frames.
     ORB_SLAM3::System SLAM(argv[1],argv[2],ORB_SLAM3::System::MONOCULAR,true);
     float imageScale = SLAM.GetImageScale();
+
+    EASY_END_BLOCK;
 
     // Vector for tracking time statistics
     vector<float> vTimesTrack;
@@ -65,9 +75,15 @@ int main(int argc, char **argv)
     cv::Mat im;
     for(int ni=0; ni<nImages; ni++)
     {
+        if (ni % 50 == 0) {
+            EASY_VALUE("frame", ni);
+        }
+        
+        // EASY_BLOCK("imread", profiler::colors::Blue500);
         // Read image from file
         im = cv::imread(vstrImageFilenames[ni],cv::IMREAD_UNCHANGED); //,cv::IMREAD_UNCHANGED);
         double tframe = vTimestamps[ni];
+        // EASY_END_BLOCK;
 
         if(im.empty())
         {
@@ -84,9 +100,13 @@ int main(int argc, char **argv)
             std::chrono::monotonic_clock::time_point t_Start_Resize = std::chrono::monotonic_clock::now();
     #endif
 #endif
-            int width = im.cols * imageScale;
-            int height = im.rows * imageScale;
-            cv::resize(im, im, cv::Size(width, height));
+
+        EASY_BLOCK("resize", profiler::colors::Blue500);
+        int width = im.cols * imageScale;
+        int height = im.rows * imageScale;
+        cv::resize(im, im, cv::Size(width, height));
+        EASY_END_BLOCK;
+
 #ifdef REGISTER_TIMES
     #ifdef COMPILEDWITHC11
             std::chrono::steady_clock::time_point t_End_Resize = std::chrono::steady_clock::now();
@@ -97,6 +117,7 @@ int main(int argc, char **argv)
             SLAM.InsertResizeTime(t_resize);
 #endif
         }
+
 
 #ifdef COMPILEDWITHC11
         std::chrono::steady_clock::time_point t1 = std::chrono::steady_clock::now();
@@ -122,6 +143,7 @@ int main(int argc, char **argv)
 
         vTimesTrack[ni]=ttrack;
 
+        EASY_BLOCK("Wait To Load the Next Frame", profiler::colors::BlueGrey200);
         // Wait to load the next frame
         double T=0;
         if(ni<nImages-1)
@@ -131,14 +153,20 @@ int main(int argc, char **argv)
 
         if(ttrack<T)
             usleep((T-ttrack)*1e6);
+
+        EASY_END_BLOCK;
     }
 
+    EASY_BLOCK("shutdown", profiler::colors::Red100);
     // Stop all threads
     SLAM.Shutdown();
+    EASY_END_BLOCK;
+
 
     // Tracking time statistics
     sort(vTimesTrack.begin(),vTimesTrack.end());
     float totaltime = 0;
+
     for(int ni=0; ni<nImages; ni++)
     {
         totaltime+=vTimesTrack[ni];
@@ -148,13 +176,19 @@ int main(int argc, char **argv)
     cout << "mean tracking time: " << totaltime/nImages << endl;
 
     // Save camera trajectory
-    SLAM.SaveKeyFrameTrajectoryTUM("KeyFrameTrajectory.txt");    
+    SLAM.SaveTrajectoryKITTI("CameraTrajectory.txt");
+    SLAM.SaveKeyFrameTrajectoryTUM("KeyFrameTrajectory.txt");
+
+    auto result = profiler::dumpBlocksToFile("slam_profile.prof");
+    std::cout << "result " << result << std::endl;
 
     return 0;
 }
 
 void LoadImages(const string &strPathToSequence, vector<string> &vstrImageFilenames, vector<double> &vTimestamps)
 {
+    EASY_BLOCK("Load Images", profiler::colors::Magenta);
+    
     ifstream fTimes;
     string strPathTimeFile = strPathToSequence + "/times.txt";
     fTimes.open(strPathTimeFile.c_str());
@@ -177,10 +211,13 @@ void LoadImages(const string &strPathToSequence, vector<string> &vstrImageFilena
     const int nTimes = vTimestamps.size();
     vstrImageFilenames.resize(nTimes);
 
+
     for(int i=0; i<nTimes; i++)
     {
         stringstream ss;
         ss << setfill('0') << setw(6) << i;
         vstrImageFilenames[i] = strPrefixLeft + ss.str() + ".png";
+        // EASY_BLOCK("Addition", profiler::colors::Red);
     }
+    EASY_END_BLOCK;
 }

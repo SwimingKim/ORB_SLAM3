@@ -93,3 +93,12 @@ borrar/*
 */ExecMean.txt
 
 Thirdparty/
+.vscode/
+*.prof
+
+
+devel/
+.catkin_workspace
+
+
+evo/output

@@ -63,10 +63,13 @@ void LocalMapping::SetTracker(Tracking *pTracker)
 
 void LocalMapping::Run()
 {
+
     mbFinished = false;
 
     while(1)
     {
+        EASY_BLOCK("LocalMapping Run", profiler::colors::Brown100);
+
         // Tracking will see that Local Mapping is busy
         SetAcceptKeyFrames(false);
 
@@ -151,8 +154,10 @@ void LocalMapping::Run()
                     }
                     else
                     {
+                        // EASY_BLOCK("Local BA", profiler::colors::Brown200);
                         Optimizer::LocalBundleAdjustment(mpCurrentKeyFrame,&mbAbortBA, mpCurrentKeyFrame->GetMap(),num_FixedKF_BA,num_OptKF_BA,num_MPs_BA,num_edges_BA);
                         b_doneLBA = true;
+                        // EASY_END_BLOCK;
                     }
 
                 }
@@ -177,6 +182,8 @@ void LocalMapping::Run()
 
 #endif
 
+                EASY_BLOCK("IMU Initialization", profiler::colors::Brown200);
+
                 // Initialize IMU here
                 if(!mpCurrentKeyFrame->GetMap()->isImuInitialized() && mbInertial)
                 {
@@ -185,6 +192,8 @@ void LocalMapping::Run()
                     else
                         InitializeIMU(1e2, 1e5, true);
                 }
+
+                EASY_END_BLOCK;
 
 
                 // Check redundant local Keyframes
@@ -276,9 +285,13 @@ void LocalMapping::Run()
             break;
 
         usleep(3000);
+
+
+        EASY_END_BLOCK;
     }
 
     SetFinish();
+
 }
 
 void LocalMapping::InsertKeyFrame(KeyFrame *pKF)
@@ -297,6 +310,7 @@ bool LocalMapping::CheckNewKeyFrames()
 
 void LocalMapping::ProcessNewKeyFrame()
 {
+    EASY_BLOCK("KeyFrame Insertion", profiler::colors::Brown200);
     {
         unique_lock<mutex> lock(mMutexNewKFs);
         mpCurrentKeyFrame = mlNewKeyFrames.front();
@@ -335,6 +349,8 @@ void LocalMapping::ProcessNewKeyFrame()
 
     // Insert Keyframe in Map
     mpAtlas->AddKeyFrame(mpCurrentKeyFrame);
+
+    EASY_END_BLOCK;
 }
 
 void LocalMapping::EmptyQueue()
@@ -345,6 +361,8 @@ void LocalMapping::EmptyQueue()
 
 void LocalMapping::MapPointCulling()
 {
+    EASY_BLOCK("Recent MapPoints Culling", profiler::colors::Brown200);
+
     // Check Recent Added MapPoints
     list<MapPoint*>::iterator lit = mlpRecentAddedMapPoints.begin();
     const unsigned long int nCurrentKFid = mpCurrentKeyFrame->mnId;
@@ -382,11 +400,15 @@ void LocalMapping::MapPointCulling()
             borrar--;
         }
     }
+
+    EASY_END_BLOCK;
 }
 
 
 void LocalMapping::CreateNewMapPoints()
 {
+    EASY_BLOCK("New Points Creation", profiler::colors::Brown200);
+
     // Retrieve neighbor keyframes in covisibility graph
     int nn = 10;
     // For stereo inertial case
@@ -708,7 +730,9 @@ void LocalMapping::CreateNewMapPoints()
             mpAtlas->AddMapPoint(pMP);
             mlpRecentAddedMapPoints.push_back(pMP);
         }
-    }    
+    }
+
+    EASY_END_BLOCK;
 }
 
 void LocalMapping::SearchInNeighbors()
@@ -901,6 +925,8 @@ void LocalMapping::InterruptBA()
 
 void LocalMapping::KeyFrameCulling()
 {
+    EASY_BLOCK("Local KeyFrames Culling", profiler::colors::Brown200);
+
     // Check redundant keyframes (only local keyframes)
     // A keyframe is considered redundant if the 90% of the MapPoints it sees, are seen
     // in at least other 3 keyframes (in the same or finer scale)
@@ -1051,6 +1077,8 @@ void LocalMapping::KeyFrameCulling()
             break;
         }
     }
+
+    EASY_END_BLOCK;
 }
 
 void LocalMapping::RequestReset()
@@ -1172,6 +1200,7 @@ bool LocalMapping::isFinished()
 
 void LocalMapping::InitializeIMU(float priorG, float priorA, bool bFIBA)
 {
+
     if (mbResetRequested)
         return;
 
@@ -1428,6 +1457,8 @@ void LocalMapping::InitializeIMU(float priorG, float priorA, bool bFIBA)
 
 void LocalMapping::ScaleRefinement()
 {
+    EASY_BLOCK("IMU Scale Refinement", profiler::colors::Brown200);
+
     // Minimum number of keyframes to compute a solution
     // Minimum time (seconds) between first and last keyframe to compute a solution. Make the difference between monocular and stereo
     // unique_lock<mutex> lock0(mMutexImuInit);
@@ -1491,6 +1522,8 @@ void LocalMapping::ScaleRefinement()
 
     // To perform pose-inertial opt w.r.t. last keyframe
     mpCurrentKeyFrame->GetMap()->IncreaseChangeIndex();
+
+    EASY_END_BLOCK;
 
     return;
 }

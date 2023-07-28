@@ -29,6 +29,7 @@
 
 #include <mutex>
 
+#include<easy/profiler.h>
 
 namespace ORB_SLAM3
 {

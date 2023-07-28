@@ -1,0 +1,5 @@
+<launch>
+
+    <node name="roscpp_example" pkg="roscpp_example" type="roscpp_example_node" output="screen"/>
+    
+</launch>

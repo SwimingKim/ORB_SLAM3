@@ -109,6 +109,7 @@ System::System(const string &strVocFile, const string &strSettingsFile, const eS
 
     bool loadedAtlas = false;
 
+    EASY_BLOCK("Load ORB Vocbulary And Create Database", profiler::colors::Magenta);
     if(mStrLoadAtlasFromFile.empty())
     {
         //Load ORB Vocabulary
@@ -176,6 +177,7 @@ System::System(const string &strVocFile, const string &strSettingsFile, const eS
 
         //usleep(10*1000*1000);
     }
+    EASY_END_BLOCK;
 
 
     if (mSensor==IMU_STEREO || mSensor==IMU_MONOCULAR || mSensor==IMU_RGBD)
@@ -398,6 +400,7 @@ Sophus::SE3f System::TrackRGBD(const cv::Mat &im, const cv::Mat &depthmap, const
 
 Sophus::SE3f System::TrackMonocular(const cv::Mat &im, const double &timestamp, const vector<IMU::Point>& vImuMeas, string filename)
 {
+    EASY_FUNCTION("TrackMonocular", profiler::colors::Blue500);
 
     {
         unique_lock<mutex> lock(mMutexReset);
@@ -1206,11 +1209,11 @@ void System::SaveKeyFrameTrajectoryEuRoC(const string &filename, Map* pMap)
 void System::SaveTrajectoryKITTI(const string &filename)
 {
     cout << endl << "Saving camera trajectory to " << filename << " ..." << endl;
-    if(mSensor==MONOCULAR)
-    {
-        cerr << "ERROR: SaveTrajectoryKITTI cannot be used for monocular." << endl;
-        return;
-    }
+    // if(mSensor==MONOCULAR)
+    // {
+    //     cerr << "ERROR: SaveTrajectoryKITTI cannot be used for monocular." << endl;
+    //     return;
+    // }
 
     vector<KeyFrame*> vpKFs = mpAtlas->GetAllKeyFrames();
     sort(vpKFs.begin(),vpKFs.end(),KeyFrame::lId);
