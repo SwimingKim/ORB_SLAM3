@@ -24,6 +24,7 @@
 
 #include<opencv2/core/core.hpp>
 #include <easy/profiler.h>
+#include <easy/arbitrary_value.h>
 
 #include"System.h"
 
@@ -74,6 +75,10 @@ int main(int argc, char **argv)
     cv::Mat im;
     for(int ni=0; ni<nImages; ni++)
     {
+        if (ni % 100 == 0) {
+            EASY_VALUE("frame", ni);
+        }
+        
         // EASY_BLOCK("imread", profiler::colors::Blue500);
         // Read image from file
         im = cv::imread(vstrImageFilenames[ni],cv::IMREAD_UNCHANGED); //,cv::IMREAD_UNCHANGED);
