@@ -75,7 +75,7 @@ int main(int argc, char **argv)
     cv::Mat im;
     for(int ni=0; ni<nImages; ni++)
     {
-        if (ni % 50 == 0) {
+        if (ni % 200 == 0) {
             EASY_VALUE("frame", ni);
         }
         
